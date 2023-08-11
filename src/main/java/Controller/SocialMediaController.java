@@ -3,31 +3,44 @@ package Controller;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-/**
- * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
- * found in readme.md as well as the test cases. You should
- * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
- */
-public class SocialMediaController {
-    /**
-     * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
-     * suite must receive a Javalin object from this method.
-     * @return a Javalin app object which defines the behavior of the Javalin controller.
-     */
-    public Javalin startAPI() {
-        Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import Model.Account;
+//import Model.Message;
+import Service.AccountService;
+//import Service.MessageService;
+
+
+
+public class SocialMediaController {
+
+    AccountService AS = new AccountService();
+    //MessageService MS = new MessageService();
+
+    public Javalin startAPI() {
+        Javalin app = Javalin.create()
+        .post("/register", this::register);
+        app.get("/login", this::login);
         return app;
     }
 
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
+    private void register(Context ctx) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account acc = mapper.readValue(ctx.body(), Account.class);
+        Account addAcc = AS.registerUser(acc);
+        if(addAcc != null){
+            ctx.json(mapper.writeValueAsString(addAcc));
+        }else
+            ctx.status(400);
     }
-
-
+    private void login(Context ctx) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account acc = mapper.readValue(ctx.body(), Account.class);
+        Account checkCreds = AS.checkCreds(acc);
+        if(checkCreds!=null){
+            ctx.json(mapper.writeValueAsString(checkCreds));
+        }else 
+            ctx.status(401);
+    }
 }
