@@ -12,11 +12,11 @@ public class AccountService {
     public AccountService(AccountDAO accDAO){
         this.accDAO = accDAO;
     }
-
+    
     public Account registerUser(Account acc){
         return accDAO.registerUser(acc);
     }
-    public Account checkCreds(Account acc){
-        return checkCreds(acc);
+    public Account logIn(String usr, String pwd){
+        return accDAO.logIn(usr, pwd);
     }
 }
