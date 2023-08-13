@@ -25,15 +25,13 @@ public class MessageService {
         return messDAO.getMessageById(msgId);
     }
     public List<Message> getMessagesByAccId(int accId){
-        if(messDAO.getMessagesByAccId(accId) == null){
+        if(messDAO.getMessagesByAccId(accId) == null)
             return null;
-        }
         return messDAO.getMessagesByAccId(accId);
     }
     public Message updateMessage(int msgId, Message msg){
         if(msg.getMessage_text().length() >= 255 || msg.getMessage_text().isBlank())
             return null;
-        else
-            return messDAO.updateMessage(msgId, msg);
+        return messDAO.updateMessage(msgId, msg);
     }
 }

@@ -18,6 +18,27 @@ import java.util.List;
  */
 
 public class MessageDAO {
+    public Message createMessage(Message msg){
+        Connection conn = ConnectionUtil.getConnection();
+        try{
+            String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
+
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, msg.getPosted_by());
+            ps.setString(2, msg.getMessage_text());
+            ps.setLong(3, msg.getTime_posted_epoch());
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs.next() && msg.getMessage_text().length() < 255 && !msg.getMessage_text().isBlank()){
+                int generated_id = (int) rs.getLong(1);
+                return new Message(generated_id, msg.getPosted_by(), msg.getMessage_text(), msg.getTime_posted_epoch());
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
     public List<Message> getAllMessages(){
         Connection conn = ConnectionUtil.getConnection();
         List<Message> msgList = new ArrayList<Message>();
@@ -26,11 +47,8 @@ public class MessageDAO {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
-                Message msg = new Message(
-                    rs.getInt("message_id"),
-                    rs.getInt("posted_by"),
-                    rs.getString("message_text"),
-                    rs.getLong("time_posted_epoch"));
+                Message msg = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
+                                          rs.getString("message_text"), rs.getLong("time_posted_epoch"));
                 msgList.add(msg);
             }
         }catch(SQLException e){
@@ -48,11 +66,8 @@ public class MessageDAO {
 
             ResultSet rs = ps.executeQuery();
             if(rs.next())
-                return new Message(
-                    rs.getInt("message_id"),
-                    rs.getInt("posted_by"),
-                    rs.getString("message_text"),
-                    rs.getLong("time_posted_epoch"));
+                return new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
+                                   rs.getString("message_text"),rs.getLong("time_posted_epoch"));
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
@@ -69,42 +84,14 @@ public class MessageDAO {
 
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
-                Message msg = new Message(
-                    rs.getInt("message_id"),
-                    rs.getInt("posted_by"),
-                    rs.getString("message_text"),
-                    rs.getLong("time_posted_epoch"));
+                Message msg = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
+                                          rs.getString("message_text"),rs.getLong("time_posted_epoch"));
                 msgList.add(msg);
             }
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
         return msgList;
-    }
-    public Message createMessage(Message msg){
-        Connection conn = ConnectionUtil.getConnection();
-        try{
-            String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
-
-            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, msg.getPosted_by());
-            ps.setString(2, msg.getMessage_text());
-            ps.setLong(3, msg.getTime_posted_epoch());
-            ps.executeUpdate();
-
-            ResultSet rs = ps.getGeneratedKeys();
-            if(rs.next() && msg.getMessage_text().length() < 255 && !msg.getMessage_text().isBlank()){
-                int generated_id = (int) rs.getLong(1);
-                return new Message(
-                    generated_id,
-                    msg.getPosted_by(), 
-                    msg.getMessage_text(), 
-                    msg.getTime_posted_epoch());
-            }
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-        return null;
     }
     public Message updateMessage(int msgId, Message msg){
         Connection conn = ConnectionUtil.getConnection();
@@ -122,12 +109,8 @@ public class MessageDAO {
 
             ResultSet rs = ps2.executeQuery();
             if(rs.next())
-                return new Message(
-                    rs.getInt("message_id"),
-                    rs.getInt("posted_by"),
-                    rs.getString("message_text"),
-                    rs.getLong("time_posted_epoch")
-                );
+                return new Message(rs.getInt("message_id"), rs.getInt("posted_by"), 
+                                   rs.getString("message_text"),rs.getLong("time_posted_epoch"));
         }catch(SQLException e){
             System.out.println(e.getMessage());
         } 

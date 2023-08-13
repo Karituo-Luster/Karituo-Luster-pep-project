@@ -6,7 +6,6 @@ import java.sql.*;
 
 /*  LEGEND/KEYWORDS:
  *  acc     = account
- *  accId   = account ID
  *  conn    = connection
  *  ps      = prepared statement
  *  rs      = result set

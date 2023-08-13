@@ -17,23 +17,26 @@ public class SocialMediaController {
     MessageService MS = new MessageService();
 
     public Javalin startAPI() {
-        Javalin app = Javalin.create()
+        Javalin app = Javalin.create();
+        
+        return app
         //CREATE
-        .post("/register", this::register)
-        .post("/login", this::login)
-        .post("/messages", this::createMessage)
+            .post("/register", this::register)
+            .post("/login", this::login)
+            .post("/messages", this::createMessage)
         //UPDATE
-        .patch("/messages/{message_id}", this::updateMessage)
+            .patch("/messages/{message_id}", this::updateMessage)
         //READ
-        .get("/messages", this::getAllMessages)
-        .get("/messages/{message_id}", this::getMessageById)
-        .get("/accounts/{account_id}/messages", this::getMessagesByAccId)
+            .get("/messages", this::getAllMessages)
+            .get("/messages/{message_id}", this::getMessageById)
+            .get("/accounts/{account_id}/messages", this::getMessagesByAccId)
         //DELETE
-        .delete("/messages/{message_id}", this::deleteMessage);
-        return app;
+            .delete("/messages/{message_id}", this::deleteMessage);
     }
-    //HANDLING METHODS
-        //CREATE
+
+//HANDLING METHODS
+
+    //CREATE
     private void register(Context ctx) throws JsonProcessingException{
         ObjectMapper om = new ObjectMapper();
         Account acc = om.readValue(ctx.body(), Account.class);
@@ -61,7 +64,7 @@ public class SocialMediaController {
         else
             ctx.status(400);
     }
-        //READ
+    //READ
     private void getAllMessages(Context ctx){
         ctx.json(MS.getAllMessages());
     }
@@ -74,18 +77,18 @@ public class SocialMediaController {
         int accId = Integer.parseInt(ctx.pathParam("account_id"));
         ctx.json(MS.getMessagesByAccId(accId));
     }
-        //UPDATE
+    //UPDATE
     private void updateMessage(Context ctx) throws JsonProcessingException{
         ObjectMapper om = new ObjectMapper();
         Message msg = om.readValue(ctx.body(), Message.class);
         int msgId = Integer.parseInt(ctx.pathParam("message_id"));
         Message update = MS.updateMessage(msgId, msg);
-        if(update == null)
-            ctx.status(400);
-        else
+        if(update != null)
             ctx.json(om.writeValueAsString(update));
+        else
+            ctx.status(400);            
     }
-        //DELETE
+    //DELETE
     private void deleteMessage(Context ctx){
         Message msg = MS.getMessageById(Integer.parseInt(ctx.pathParam("message_id")));
         if(msg != null)
